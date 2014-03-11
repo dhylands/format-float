@@ -233,7 +233,7 @@ void test_print(char *buf, int buf_size, const char *fmt, float f)
         s++;
         if (isdigit(*s)) {
             char *endptr;
-            prec = strtoul(s, &endptr, 10); 
+            prec = strtoul(s, &endptr, 10);
             s = endptr;
         }
         else {
@@ -261,7 +261,7 @@ void test_print(char *buf, int buf_size, const char *fmt, float f)
         memset(&buf[len], ' ', width - len);
         return;
     }
-    memmove(&buf[width - len], buf, len); 
+    memmove(&buf[width - len], buf, len);
     if (zero_pad) {
         memset(buf, '0', width - len);
     } else {

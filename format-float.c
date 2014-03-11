@@ -1,14 +1,14 @@
-/*********************************************************************** 
- 
+/***********************************************************************
+
   format-float.c  - Ruutine for converting a single-precision floating
                     point number into a string.
- 
+
   The code in this funcion was inspired from Fred Bayer's pdouble.c.
   Since pdouble.c was released as Public Domain, I'm releasing this
   code as public domain as well.
- 
+
   Dave Hylands
- 
+
 ***********************************************************************/
 
 #include <stdio.h>
@@ -87,7 +87,7 @@ int format_float(float f, char *buf, size_t buf_size, char fmt, int prec, char s
     if (fmt == 'g' && prec == 0) {
         prec = 1;
     }
-    int e, e1; 
+    int e, e1;
     int dec = 0;
     char e_sign = '\0';
     int num_digits = 0;
@@ -112,7 +112,7 @@ int format_float(float f, char *buf, size_t buf_size, char fmt, int prec, char s
         if (num.f < 1.0F && num.f >= 0.9999995F) {
             num.f = 1.0F;
         } else {
-            e++; 
+            e++;
             num.f *= 10.0F;
         }
 
@@ -133,7 +133,7 @@ int format_float(float f, char *buf, size_t buf_size, char fmt, int prec, char s
             }
             num_digits = prec;
             if (num_digits) {
-                *s++ = '.'; 
+                *s++ = '.';
                 while (--e && num_digits) {
                     *s++ = '0';
                     num_digits--;
@@ -161,7 +161,7 @@ int format_float(float f, char *buf, size_t buf_size, char fmt, int prec, char s
             }
         }
 
-        // If the user specified fixed format (fmt == 'f') and e makes the 
+        // If the user specified fixed format (fmt == 'f') and e makes the
         // number too big to fit into the available buffer, then we'll
         // switch to the 'e' format.
 
@@ -216,7 +216,7 @@ int format_float(float f, char *buf, size_t buf_size, char fmt, int prec, char s
         if (prec == 0) {
             prec = 1;
         }
-        num_digits = prec; 
+        num_digits = prec;
     }
 
     // Print the digits of the mantissa
@@ -252,7 +252,7 @@ int format_float(float f, char *buf, size_t buf_size, char fmt, int prec, char s
             if (rs == buf) {
                 break;
             }
-            rs--; 
+            rs--;
         }
         if (*rs == '0') {
             // We need to insert a 1
@@ -264,11 +264,11 @@ int format_float(float f, char *buf, size_t buf_size, char fmt, int prec, char s
                 if (e_sign == '-') {
                     e--;
                 } else {
-                    e++; 
+                    e++;
                 }
             }
             s++;
-            char *ss = s; 
+            char *ss = s;
             while (ss > rs) {
                 *ss = ss[-1];
                 ss--;

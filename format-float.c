@@ -112,8 +112,11 @@ int format_float(float f, char *buf, size_t buf_size, char fmt, int prec, char s
         char first_dig = '0';
         char e_sign_char = '-';
         if (num.f < 1.0F && num.f >= 0.9999995F) {
+
             num.f = 1.0F;
-            first_dig = '1';
+            if (e > 1) {
+                first_dig = '1';
+            }
             if (e == 0) {
                 e_sign_char = '+';
             }
@@ -272,6 +275,10 @@ int format_float(float f, char *buf, size_t buf_size, char fmt, int prec, char s
                 } else {
                     e++;
                 }
+                #if 0
+                s--; // We want to convert 9.99 to 10.0 so that we have the
+                     // same number of digits.
+                #endif
             }
             s++;
             char *ss = s;

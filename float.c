@@ -11,7 +11,13 @@
 static int g_pass_count = 0;
 static int g_fail_count = 0;
 
+#define DO_GFMT_TEST    1
+#define DO_GFNUM_TEST   0
+#define DO_GBUFTEST     0
+
+#if DO_GFMT_TEST || DO_GFNUM_TEST
 const char *gFmt[] = {
+#if 0
     "%e",
     "%.1e", "%.2e", "%.3e", "%.4e",
     "%+e",
@@ -22,7 +28,9 @@ const char *gFmt[] = {
     "% 12.4e",
     "%012.4e",
     "%6.3e",
+#endif
     "%5.e",
+#if 0
     "%.e",
     "%.1e",
     "%1e", "%2e",
@@ -34,10 +42,12 @@ const char *gFmt[] = {
     "%6.1e", "%6.2e", "%6.3e", "%6.4e",
     "%7.1e", "%7.2e", "%7.3e", "%7.4e",
     "%8.1e", "%8.2e", "%8.3e", "%8.4e",
+#endif
 };
 #define NUM_FMT (sizeof(gFmt) / sizeof(gFmt[0]))
 
 float gNum[] = {
+#if 0
     0.0F,   // Placeholder for nan
     INFINITY,
     -INFINITY,
@@ -67,9 +77,18 @@ float gNum[] = {
     1.23456e-1, 1.23456e-2, 1.23456e-3, 1.23456e-4, 1.23456e-5, 1.23456e-6, 1.23456e-7, 1.23456e-8,
     -1.23456e8, -1.23456e7, -1.23456e6, -1.23456e5, -1.23456e4, -1.23456e3, -1.23456e2, -1.23456e1, -1.23456e0,
     -1.23456e-1, -1.23456e-2, -1.23456e-3, -1.23456e-4, -1.23456e-5, -1.23456e-6, -1.23456e-7, -1.23456e-8,
+
+#endif
+
+    0.09999995,
+    9.99999e-6, 9.99999e-5, 9.99999e-4, 9.99999e-3, 9.99999e-2, 9.99999e-1,
+    9.99999e0, 9.99999e1, 9.99999e2, 9.99999e3, 9.99999e4, 9.99999e5,
+    9.99999e6,
 };
 #define NUM_NUM (sizeof(gNum) / sizeof(gNum[0]))
+#endif // DO_GFMT_TEST
 
+#if DO_GFNUM_TEST
 // Since there is really only 6 full digits of significance in 32-bit floats,
 // the f style formats need a much more limited range and still hope to compare
 // so we create sets of formats and numbers which work together.
@@ -84,9 +103,16 @@ static float gFNum[] = {
     0.0012F, 0.0123F, 0.1234F, 1.2345F, 12.3456F,
     -0.0001F, -0.001F, -0.01F, -0.1F, -1.0F, -10.0F,
     -0.0012F, -0.0123F, -0.1234F, -1.2345F, -12.3456F,
+
+    0.09999995,
+    9.99999e-6, 9.99999e-5, 9.99999e-4, 9.99999e-3, 9.99999e-2, 9.99999e-1,
+    9.99999e0, 9.99999e1, 9.99999e2, 9.99999e3, 9.99999e4, 9.99999e5,
+    9.99999e6,
 };
 #define NUM_FNUM (sizeof(gFNum) / sizeof(gFNum[0]))
+#endif
 
+#if DO_GBUFTEST
 typedef struct {
     float num;
     char fmt_char;
@@ -194,6 +220,7 @@ static BufTest gBufTest[] = {
     { -1.234e-5F, 'g', '\0', 3, 11, "-1.23e-05" },
 };
 #define NUM_BUF_TEST (sizeof(gBufTest) / sizeof(gBufTest[0]))
+#endif
 
 int test_vsnprintf(char *str, size_t size, const char *fmt, va_list ap);
 int test_snprintf(char *str, size_t size, const char *fmt, ...);
@@ -289,9 +316,11 @@ void DoTest(const char *fmt, float num)
         g_fail_count++;
     }
     printf("%-8s >%s< >%s<\x1b[0m\n", fmt, str, str2);
+#if 0
     if (g_fail_count) {
         exit(1);
     }
+#endif
 }
 
 void DoBufTest(float num, char fmt_char, char sign, int prec, size_t buf_size, const char *expected)
@@ -323,13 +352,18 @@ void DoBufTest(float num, char fmt_char, char sign, int prec, size_t buf_size, c
 }
 
 int main(int argc, char **argv) {
+#if DO_GFMT_TEST
     if (gNum[0] == 0.0F) {
         gNum[0] = nanf("");
     }
+#endif
+#if DO_GFNUM_TEST
     if (gFNum[0] == 0.0F) {
         gFNum[0] = nanf("");
     }
+#endif
 
+#if DO_GFMT_TEST
     for (int num_idx = 0; num_idx < NUM_NUM; num_idx++) {
         for (int fmt_idx = 0; fmt_idx < NUM_FMT; fmt_idx++) {
             char *fmt = strdup(gFmt[fmt_idx]);
@@ -344,7 +378,9 @@ int main(int argc, char **argv) {
             free(fmt);
         }
     }
+#endif
 
+#if DO_GFNUM_TEST
     for (int num_idx = 0; num_idx < NUM_FNUM; num_idx++) {
         for (int fmt_idx = 0; fmt_idx < NUM_FMT; fmt_idx++) {
             char *fmt = strdup(gFmt[fmt_idx]);
@@ -354,12 +390,24 @@ int main(int argc, char **argv) {
             free(fmt);
         }
     }
-
+#endif
+#if DO_GBUFTEST
     for (BufTest *bt = gBufTest; bt < &gBufTest[NUM_BUF_TEST]; bt++) {
         DoBufTest(bt->num, bt->fmt_char, bt->sign, bt->prec, bt->buf_size, bt->expected);
     }
+#endif
 
     printf("PASS: %d FAIL: %d\n", g_pass_count, g_fail_count);
+
+    {
+        float f = 9.999999e6;
+        //memcpy(&f, "\xcc\xcc\xcc=", 4);
+        char buf[100];
+        format_float(f, buf, 9, 'E', 2, 0);
+        printf("Got '%s'\n", buf);
+        snprintf(buf, sizeof(buf), "%8.2E", f);
+        printf("Exp '%s'\n", buf);
+    }
     return 0;
 }
 
